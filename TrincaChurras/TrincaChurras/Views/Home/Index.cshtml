@@ -1,0 +1,160 @@
+﻿@using TrincaChurras.Models
+@model ChurrasGridModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row well">
+    <div class="col-md-3">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Data, new { @class = "control-label" })
+            <div class="input-group date" id="data_component">
+                @Html.TextBoxFor(m => m.Data, new { @class = "form-control", @readonly = "readonly", @style = "background-color: white" })<span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Descricao, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Descricao, new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Participantes, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.Participantes, new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            @Html.LabelFor(m => m.TotalArrecadado, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.TotalArrecadado, new { @class = "form-control" })
+        </div>
+    </div>
+</div>
+<div class="row well">
+    <div class="col-md-12">
+        <table id="churras" class="table table-bordered table-striped table-rowlink" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Data</th>
+                    <th>Descrição</th>
+                    <th>Participantes</th>
+                    <th>Total Arrecadado</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-offset-10 col-md-2">
+        <a class="btn btn-primary" id="btnNovo">
+            <span class="glyphicon glyphicon-plus"></span> Novo Churras (Oba!)
+        </a>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $(function () {
+
+        $("#TotalArrecadado").inputmask("decimal", {
+            prefix: "R$ ",
+            radixPoint: ",",
+            groupSeparator: ".",
+            autoGroup: true,
+            digits: 2,
+            digitsOptional: false,
+            placeholder: "0",
+            rightAlign: false
+        });
+
+        $("#Participantes").inputmask("numeric", {
+            rightAlign: false
+        });
+
+        $("#btnNovo").on("click", function () {
+            window.location.href = "@(Url.Action("New","Churras"))";
+        });
+
+        var churrasTable = $("#churras").DataTable({
+            "language": {
+                "url": "https://cdn.datatables.net/plug-ins/1.10.13/i18n/Portuguese-Brasil.json"
+            },
+            "processing": true,
+            "serverSide": true,
+            "searching": false,
+            "order": [[ 1, "desc" ]],
+            "columnDefs": [
+                {
+                    "targets": [0],
+                    "visible": false,
+                    "searchable": false
+                }
+            ],
+            "rowCallback": function( row, data, index ) {
+                $(row).on("click", function () {
+                    window.location.href = "@(Url.Action("View", "Churras"))/" + data[0];
+                });
+            },
+            "ajax": {
+                "url": "@(Url.Action("ChurrasSource"))",
+                "data": function (d) {
+                    d.pModelSearch = {};
+
+                    d.pModelSearch.Data = $("#data_component").datepicker("getDate") ? $("#data_component").datepicker("getDate").toISOString() : "";
+                    d.pModelSearch.Descricao = $("#Descricao").val();
+                    d.pModelSearch.Participantes = $("#Participantes").val();
+                    d.pModelSearch.TotalArrecadado = $("#TotalArrecadado").inputmask('unmaskedvalue');
+                }
+            }
+        });
+
+        $('#data_component').datepicker({
+            format: "dd/mm/yyyy",
+            language: "pt-BR",
+            clearBtn: true,
+            autoclose: true,
+            todayBtn: "linked",
+            todayHighlight: true,
+        })
+        .on('change', function (e) {
+            churrasTable.ajax.reload();
+        });
+
+        $("#Descricao,#Participantes,#TotalArrecadado").on("keyup", function (e) {
+            if (event.defaultPrevented) {
+                return;
+            }
+
+            switch (e.key) {
+                case "ArrowDown":
+                case "ArrowUp":
+                case "ArrowLeft":
+                case "ArrowRight":
+                case "Escape":
+                case "Alt":
+                case "Control":
+                case "Shift":
+                case "End":
+                case "Home":
+                case "Insert":
+                case "CapsLock":
+                case "NumLock":
+                case "ScrollLock":
+                case "PrintScreen":
+                case "Pause":
+                case "Cancel":
+                    break;
+                default:
+                    churrasTable.ajax.reload();
+                    break;
+            }
+            
+            e.preventDefault();
+        });
+
+    });
+
+</script>

@@ -1,0 +1,112 @@
+﻿@using TrincaChurras.Models;
+@model ParticipanteModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<form id="frmParticipante">
+    @Html.HiddenFor(m => m.IdParticipante)
+    @Html.HiddenFor(m => m.IdChurras)
+    <div class="well" id="divFormParticipante">
+        <div class="row">
+            <div class="col-md-offset-3 col-md-3">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Nome, new { @class = "control-label" })
+                    @Html.TextBoxFor(m => m.Nome, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Nome)
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Contribuicao, new { @class = "control-label" })
+                    @Html.TextBoxFor(m => m.Contribuicao, new { @class = "form-control" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-offset-3 col-md-3">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Pago, new { @class = "control-label" })
+                    @Html.CheckBoxFor(m => m.Pago, new { @data_group_cls = "btn-group-justified", data_off_icon_cls = "glyphicon-thumbs-down", @data_on_icon_cls = "glyphicon-thumbs-up" })
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Bebida, new { @class = "control-label" })
+                    @Html.CheckBoxFor(m => m.Bebida, new { @data_group_cls = "btn-group-justified", data_off_icon_cls = "glyphicon-thumbs-down", @data_on_icon_cls = "glyphicon-thumbs-up" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-offset-3 col-md-7">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Observacao, new { @class = "control-label" })
+                    @Html.TextAreaFor(m => m.Observacao, new { @class = "form-control" })
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<div class="row">
+    <div class="col-md-offset-7 col-md-5" style="text-align: right">
+        <a class="btn btn-default" id="btnCancelar">
+            <span class="glyphicon glyphicon-arrow-left"></span> Voltar ao Churras
+        </a>
+        <a class="btn btn-default" id="btnListarParticipantes">
+            <span class="glyphicon glyphicon-list"></span> Ver Participantes
+        </a>
+        <a class="btn btn-primary" id="btnSalvar">
+            <span class="glyphicon glyphicon-floppy-save"></span> Salvar
+        </a>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+
+        $('#Pago').checkboxpicker();
+        $('#Bebida').checkboxpicker({
+            onLabel: "@((ViewBag.Churras as ChurrasModel).ValorComBebida.Value.ToString("C2"))",
+            offLabel: "@((ViewBag.Churras as ChurrasModel).ValorSemBebida.Value.ToString("C2"))"
+        })
+
+        $("#Contribuicao").inputmask("decimal", {
+            prefix: "R$ ",
+            radixPoint: ",",
+            groupSeparator: ".",
+            autoGroup: true,
+            digits: 2,
+            digitsOptional: false,
+            placeholder: "0",
+            rightAlign: false,
+            autoUnmask: true
+        });
+
+        $("#btnCancelar").on("click", function () {
+            window.location.href = "@(Url.Action("View", "Churras"))/"+"@Model.IdChurras"
+        });
+
+        $("#btnListarParticipantes").on("click", function () {
+            window.location.href = "@(Url.Action("ListarParticipantes", "Churras"))/" + "@Model.IdChurras";
+        });
+
+        $("#btnSalvar").on("click", function (e) {
+            e.preventDefault();
+
+            if (!$("#frmParticipante").valid())
+                return;
+
+            $.post("@Url.Action("Save")", $("#frmParticipante").serialize(), function (data) {
+                if (!data.success)
+                    prependAlertTo("#divFormParticipante", "danger", data.message);
+                else
+                    window.location.href = "@(Url.Action("ListarParticipantes", "Churras"))/" + "@Model.IdChurras";
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                prependAlertTo("#divFormParticipante", "danger", errorThrown);
+            });
+        });
+    });
+</script>

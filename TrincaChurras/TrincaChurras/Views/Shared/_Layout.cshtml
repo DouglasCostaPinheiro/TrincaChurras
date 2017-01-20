@@ -1,0 +1,98 @@
+﻿<html>
+    <head>
+        <title>@(ViewBag.Title) - Os Churras da Trinca</title>
+        <script type="text/javascript" src="~/Scripts/jquery-1.9.1.js"></script>
+        <script type="text/javascript" src="~/Scripts/bootstrap.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/1.10.13/js/dataTables.bootstrap.min.js"></script>
+        <script type="text/javascript" src="~/Scripts/jquery.validate.js"></script>
+        <script type="text/javascript" src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+        <script type="text/javascript" src="~/Scripts/jquery.validate.unobtrusive.bootstrap.js"></script>
+        
+        <script type="text/javascript" src="~/Scripts/cldr.js"></script>
+        <script type="text/javascript" src="~/Scripts/cldr/event.js"></script>
+        <script type="text/javascript" src="~/Scripts/cldr/supplemental.js"></script>
+        <script type="text/javascript" src="~/Scripts/cldr/unresolved.js"></script>
+        <script type="text/javascript" src="~/Scripts/globalize.js"></script>
+        <script type="text/javascript" src="~/Scripts/globalize/message.js"></script>
+        <script type="text/javascript" src="~/Scripts/globalize/number.js"></script>
+        <script type="text/javascript" src="~/Scripts/globalize/plural.js"></script>
+        <script type="text/javascript" src="~/Scripts/globalize/date.js"></script>
+        <script type="text/javascript" src="~/Scripts/globalize/currency.js"></script>
+        <script type="text/javascript" src="~/Scripts/globalize/relative-time.js"></script>
+        <script type="text/javascript" src="~/Scripts/globalize/unit.js"></script>
+
+        <script type="text/javascript" src="~/Scripts/bootstrap-datepicker.js"></script>
+        <script type="text/javascript" src="~/Scripts/bootstrap-datepicker.pt-BR.min.js"></script>
+        <script type="text/javascript" src="~/Scripts/jquery.inputmask/inputmask.js"></script>
+        <script type="text/javascript" src="~/Scripts/jquery.inputmask/jquery.inputmask.js"></script>
+        <script type="text/javascript" src="~/Scripts/jquery.inputmask/inputmask.extensions.js"></script>
+        <script type="text/javascript" src="~/Scripts/jquery.inputmask/inputmask.numeric.extensions.js"></script>
+        <script type="text/javascript" src="~/Scripts/bootstrap-clockpicker.js"></script>
+        <script type="text/javascript" src="~/Scripts/bootstrap-checkbox.js"></script>
+        <script type="text/javascript" src="~/Scripts/bootstrap-checkbox/pt.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="~/Content/bootstrap.css" />
+        <link rel="stylesheet" type="text/css" href="~/Content/bootstrap-theme.css" />
+        <link rel="stylesheet" type="text/css" href="~/Content/bootstrap-datepicker3.css" />
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/dataTables.bootstrap.min.css" />
+        <link rel="stylesheet" type="text/css" href="~/Content/bootstrap-clockpicker.css" />
+
+        <style type="text/css">
+            h1,h2{
+                text-align: center;
+            }
+            th.dt-center, td.dt-center{
+                text-align: center
+            }
+            .table-rowlink tbody tr:hover td, .table-rowlink tbody tr:hover th {
+                background-color: cornflowerblue;
+                color: white;
+                cursor: pointer;
+            }
+        </style>
+
+        <script type="text/javascript">
+            $.when(
+              $.getJSON("/Scripts/cldr/main/pt/ca-gregorian.json"),
+              $.getJSON("/Scripts/cldr/main/pt/numbers.json"),
+              $.getJSON("/Scripts/cldr/supplemental/likelySubtags.json"),
+              $.getJSON("/Scripts/cldr/supplemental/timeData.json"),
+              $.getJSON("/Scripts/cldr/supplemental/weekData.json")
+            ).then(function () {
+
+                return [].slice.apply(arguments, [0]).map(function (result) {
+                    return result[0];
+                });
+
+            }).then(Globalize.load)
+            .then(function () {
+                Globalize.locale("pt");
+            });
+
+            $.validator.methods.date = function (value, element) {
+                return this.optional(element) || Globalize.dateParser()(value);
+            }
+
+            $.validator.methods.number = function (value, element) {
+                var val = Globalize.numberParser()(value);
+                return this.optional(element) || ($.isNumeric(val));
+            };
+
+
+            function prependAlertTo(selectorOrJqueryElement, alertType, content) {
+                $(selectorOrJqueryElement).prepend(
+                    $("<div/>").addClass("alert alert-" + alertType + " alert-dismissable").text(content).append(
+                        $("<a/>").attr("href", "#").addClass("close").attr("data-dismiss", "alert").attr("aria-label", "close").html("&#215;")
+                    )
+                );
+            }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Os Churras da Trinca</h1>
+            @RenderBody()
+        </div>
+    </body>
+</html>

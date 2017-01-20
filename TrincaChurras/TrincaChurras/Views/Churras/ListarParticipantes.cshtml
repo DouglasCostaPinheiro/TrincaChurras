@@ -1,0 +1,180 @@
+﻿@model TrincaChurras.Models.ParticipanteModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div class="well">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Nome, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.Nome, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Contribuicao, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.Contribuicao, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Bebida, new { @class = "control-label", @style = "width: 100%" })
+                @Html.CheckBoxFor(m => m.Bebida, new { @disabled = "disabled" })
+                <a class="btn btn-default filter-toggle" filter="#Bebida">Habilitar Filtro</a>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Pago, new { @class = "control-label", @style = "width: 100%" })
+                @Html.CheckBoxFor(m => m.Pago, new { @disabled = "disabled" })
+                <a class="btn btn-default filter-toggle" filter="#Pago">Habilitar Filtro</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="well">
+    <div class="row">
+        <div class="col-md-12">
+            <table id="participantes" class="table table-striped table-bordered table-rowlink" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Nome</th>
+                        <th>Contribuição</th>
+                        <th>Bebida</th>
+                        <th>Pago</th>
+                        <th>Observação</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-offset-8 col-md-4" style="text-align: right">
+        <a class="btn btn-default" id="btnVoltar">
+            <span class="glyphicon glyphicon-arrow-left"></span> Voltar ao Churras
+        </a>
+        <a class="btn btn-primary" id="btnAddParticipante">
+            <span class="glyphicon glyphicon-plus"></span> Adicionar Participante
+        </a>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+
+        var participantesTable = $("#participantes").DataTable({
+            "language": {
+                "url": "https://cdn.datatables.net/plug-ins/1.10.13/i18n/Portuguese-Brasil.json"
+            },
+            "processing": true,
+            "serverSide": true,
+            "searching": false,
+            "order": [[1, "desc"]],
+            "columnDefs": [
+                {
+                    "targets": [0],
+                    "visible": false,
+                    "searchable": false
+                },
+                {
+                    "targets": [3, 4],
+                    "className": "dt-center"
+                }
+            ],
+            "rowCallback": function (row, data, index) {
+                $(row).on("click", function () {
+                    window.location.href = "@(Url.Action("Edit", "Participante"))/" + data[0] + "?pIdChurras=" + "@(((Guid)ViewBag.IdChurras).ToString())";
+                });
+            },
+            "ajax": {
+                "url": "@(Url.Action("ParticipantesSource"))",
+                "data": function (d) {
+                    d.pModelSearch = {};
+                    d.pExtraData = {};
+
+                    d.pExtraData.IdChurras = "@(((Guid)ViewBag.IdChurras).ToString())";
+                    d.pModelSearch.Nome = $("#Nome").val();
+                    d.pModelSearch.Contribuicao = $("#Contribuicao").inputmask('unmaskedvalue');
+                    if (!$("#Bebida").prop("disabled"))
+                        d.pModelSearch.Bebida = $("#Bebida").is(":checked");
+                    if (!$("#Pago").prop("disabled"))
+                        d.pModelSearch.Pago = $("#Pago").is(":checked");
+                }
+            }
+        });
+
+        $(":checkbox").checkboxpicker().on("change", function () {
+            participantesTable.ajax.reload();
+        });
+
+        $(".filter-toggle").each(function () {
+            $(this).text($($(this).attr("filter")).prop("disabled") ? "Habilitar Filtro" : "Desabilitar Filtro");
+        });
+
+        $(".filter-toggle").on("click", function () {
+            $($(this).attr("filter")).prop("disabled", !$($(this).attr("filter")).prop("disabled"));
+
+            $(this).text($($(this).attr("filter")).prop("disabled") ? "Habilitar Filtro" : "Desabilitar Filtro");
+
+            participantesTable.ajax.reload();
+        });
+
+        $("#Contribuicao").inputmask("decimal", {
+            prefix: "R$ ",
+            radixPoint: ",",
+            groupSeparator: ".",
+            autoGroup: true,
+            digits: 2,
+            digitsOptional: false,
+            placeholder: "0",
+            rightAlign: false,
+            autoUnmask: true
+        });
+        $("#Nome,#Contribuicao").on("keyup", function (e) {
+            if (event.defaultPrevented) {
+                return;
+            }
+
+            switch (e.key) {
+                case "ArrowDown":
+                case "ArrowUp":
+                case "ArrowLeft":
+                case "ArrowRight":
+                case "Escape":
+                case "Alt":
+                case "Control":
+                case "Shift":
+                case "End":
+                case "Home":
+                case "Insert":
+                case "CapsLock":
+                case "NumLock":
+                case "ScrollLock":
+                case "PrintScreen":
+                case "Pause":
+                case "Cancel":
+                    break;
+                default:
+                    participantesTable.ajax.reload();
+                    break;
+            }
+
+            e.preventDefault();
+        });
+
+        $("#btnAddParticipante").on("click", function () {
+            window.location.href = "@(Url.Action("New", "Participante"))/" + "@(((Guid)ViewBag.IdChurras).ToString())";
+        });
+
+        $("#btnVoltar").on("click", function () {
+            window.location.href = "@(Url.Action("View", "Churras"))/" + "@(((Guid)ViewBag.IdChurras).ToString())";
+        });
+
+    });
+</script>

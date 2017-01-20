@@ -1,0 +1,135 @@
+﻿@model TrincaChurras.Models.ChurrasModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 style="text-align:center">@Model.Descricao</h2>
+
+<div class="row well" id="divViewChurras">
+    <div class="row">
+        <div class="col-md-offset-3 col-md-1">
+            @Html.LabelFor(m => m.Data)
+        </div>
+        <div class="col-md-8">
+            @Model.Data.ToString("dd/MM/yyyy hh:mm")
+        </div>
+    </div>
+    <div class="row" style="margin-top: 2.5%">
+        <div class="col-md-offset-3 col-md-1">
+            @Html.LabelFor(m => m.Observacao)
+        </div>
+        <div class="col-md-8" style="overflow-wrap: break-word">
+            @Model.Observacao
+        </div>
+    </div>
+    <div class="row" style="margin-top: 2.5%">
+        <div class="col-md-offset-3 col-md-9">
+            <strong>Quantos pila?</strong>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-offset-4 col-md-2">
+            @Html.LabelFor(m => m.ValorComBebida)
+        </div>
+        <div class="col-md-6">
+            <strong>@Model.ValorComBebida.Value.ToString("C2")</strong>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-offset-4 col-md-2">
+            @Html.LabelFor(m => m.ValorSemBebida)
+        </div>
+        <div class="col-md-6">
+            <strong>@Model.ValorSemBebida.Value.ToString("C2")</strong>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="row">
+        <div class="col-md-offset-7 col-md-5" style="text-align: right">
+            <a class="btn btn-default" id="btnVoltar">
+                <span class="glyphicon glyphicon-home"></span> Home
+            </a>
+            <a class="btn btn-default" id="btnListarParticipantes">
+                <span class="glyphicon glyphicon-list"></span> Ver Participantes
+            </a>
+            <a class="btn btn-primary" id="btnAddParticipante">
+                <span class="glyphicon glyphicon-plus"></span> Adicionar Participante
+            </a>
+        </div>
+    </div>
+</div>
+<div class="row" style="margin-top: 2.5%">
+    <div class="col-md-offset-2 col-md-8 well">
+        <div class="row">
+            <div class="col-md-offset-2 col-md-4">
+                @Html.LabelFor(m => m.Participantes)
+            </div>
+            <div class="col-md-3">
+                @Model.Participantes
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-offset-2 col-md-4">
+                @Html.LabelFor(m => m.ValorTotal)
+            </div>
+            <div class="col-md-3">
+                @Model.ValorTotal.ToString("C2")
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-offset-2 col-md-4">
+                @Html.LabelFor(m => m.ValorPago)
+            </div>
+            <div class="col-md-3">
+                @Model.ValorPago.ToString("C2")
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-offset-2 col-md-4">
+                @Html.LabelFor(m => m.ValorFaltante)
+            </div>
+            <div class="col-md-3">
+                @Model.ValorFaltante.ToString("C2")
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-offset-3 col-md-3">
+                @Html.LabelFor(m => m.TotalComBebida)
+            </div>
+            <div class="col-md-3">
+                @Model.TotalComBebida
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-offset-3 col-md-3">
+                @Html.LabelFor(m => m.TotalSemBebida)
+            </div>
+            <div class="col-md-3">
+                @Model.TotalSemBebida
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        @if (TempData["SuccessMessageView"] != null)
+        {
+            <text>prependAlertTo("#divViewChurras", "success", "@TempData["SuccessMessageView"]");</text>
+        }
+
+        $("#btnVoltar").on("click", function () {
+            window.location.href = "@(Url.Action("Index", "Home"))";
+        });
+
+        $("#btnListarParticipantes").on("click", function () {
+            window.location.href = "@(Url.Action("ListarParticipantes", "Churras"))/" + "@Model.Id";
+        });
+
+        $("#btnAddParticipante").on("click", function () {
+            window.location.href = "@(Url.Action("New", "Participante"))/" + "@Model.Id";
+        });
+    });
+</script>
